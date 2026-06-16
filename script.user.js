@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         בני ברק - אימוג'י חכם PRO
 // @namespace    https://github.com/tsoolgee/BNAI-BRAK-IMOGI
-// @version      1.0.0
+// @version      1.0.1
 // @description  המרה חכמה של טקסט לאימוג'ים + תמיכה בדפים דינמיים
 // @author       You
 // @match        https://bnebrak.com/*
@@ -20,6 +20,12 @@
         ['חחח', '😄'],
         ['חח', '😊'],
         ['אני ישן', '😴'],
+        ['קריצה', '😉'],
+        [':עצוב', '😞'],
+        [':שמח', '🙂'],
+        [':תודה', '👍'],
+        ['כוכב', '⭐'],
+        [':לב', '❤']
     ];
 
     const processed = new WeakSet();
