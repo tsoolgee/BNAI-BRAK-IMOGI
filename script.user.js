@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         בני ברק - אימוג'י חכם PRO
+// @name         בני ברק - אימוג'י חכם PRO MAX
 // @namespace    https://github.com/tsoolgee/BNAI-BRAK-IMOGI
-// @version      1.0.1
-// @description  המרה חכמה של טקסט לאימוג'ים + תמיכה בדפים דינמיים
+// @version      1.1.0
+// @description  המרת טקסט לאימוג'ים בצורה יציבה ומהירה לדפים דינמיים
 // @author       You
 // @match        https://bnebrak.com/*
 // @grant        none
@@ -28,41 +28,39 @@
         [':לב', '❤']
     ];
 
-    const processed = new WeakSet();
+    const SKIP_TAGS = new Set(['INPUT', 'TEXTAREA', 'SCRIPT', 'STYLE']);
 
     function escape(str) {
         return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
-    function replaceText(node) {
+    function shouldSkip(node) {
+        if (node.nodeType !== 1) return false;
+        return SKIP_TAGS.has(node.tagName) || node.isContentEditable;
+    }
+
+    function processTextNode(node) {
         if (!node || node.nodeType !== Node.TEXT_NODE) return;
-        if (processed.has(node)) return;
 
         let text = node.nodeValue;
-        let changed = false;
+        let original = text;
 
         for (const [from, to] of map) {
             if (text.includes(from)) {
                 text = text.replace(new RegExp(escape(from), 'g'), to);
-                changed = true;
             }
         }
 
-        if (changed) node.nodeValue = text;
-
-        processed.add(node);
+        if (text !== original) {
+            node.nodeValue = text;
+        }
     }
 
     function walk(node) {
-        if (!node) return;
-
-        if (node.nodeType === 1) {
-            const tag = node.tagName;
-            if (tag === 'INPUT' || tag === 'TEXTAREA' || node.isContentEditable) return;
-        }
+        if (!node || shouldSkip(node)) return;
 
         if (node.nodeType === Node.TEXT_NODE) {
-            replaceText(node);
+            processTextNode(node);
             return;
         }
 
@@ -76,13 +74,17 @@
     // ריצה ראשונית
     walk(document.body);
 
-    // observer חכם (רק תוספות חדשות)
+    // MutationObserver עם debounce קטן למניעת עומס
+    let timeout;
     const observer = new MutationObserver((mutations) => {
-        for (const m of mutations) {
-            for (const n of m.addedNodes) {
-                walk(n);
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            for (const m of mutations) {
+                for (const n of m.addedNodes) {
+                    walk(n);
+                }
             }
-        }
+        }, 50);
     });
 
     observer.observe(document.body, {
