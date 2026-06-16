@@ -1,11 +1,13 @@
 // ==UserScript==
-// @name         בני ברק - אימוג'י חכם PRO FINAL
+// @name         בני ברק - אימוג'י חכם
 // @namespace    https://github.com/tsoolgee/BNAI-BRAK-IMOGI
-// @version      1.2.2
-// @description  המרה חכמה של טקסט לאימוג'ים
+// @version      2.0.0
+// @description  המרת טקסט לאימוג'ים באתר bnebrak.com
 // @author       You
 // @match        https://bnebrak.com/*
 // @grant        none
+// @updateURL    https://raw.githubusercontent.com/tsoolgee/BNAI-BRAK-IMOGI/main/script.user.js
+// @downloadURL  https://raw.githubusercontent.com/tsoolgee/BNAI-BRAK-IMOGI/main/script.user.js
 // ==/UserScript==
 
 (function () {
@@ -13,38 +15,31 @@
 
     const map = [
         ['חחחח', '😂'],
-        ['חחח', '😄'],
-        ['חח', '😊'],
-        ['קריצה', '😉'],
-        [':עצוב', '😞'],
+        ['חחח',  '😄'],
+        ['חח',   '😊'],
+        ['קריצה','😉'],
+        [':עצוב','😞'],
         [':שמח', '🙂'],
-        [':תודה', '👍'],
+        [':תודה','👍'],
         ['כוכב', '⭐'],
-        [':לב', '❤']
+        [':לב',  '❤️']
     ];
 
-    const SKIP_TAGS = new Set(['INPUT', 'TEXTAREA', 'SCRIPT', 'STYLE']);
+    const SKIP = new Set(['INPUT','TEXTAREA','SCRIPT','STYLE','NOSCRIPT']);
 
-    function escape(str) {
+    function escapeRegex(str) {
         return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
-    function shouldSkip(node) {
-        return (
-            node.nodeType === 1 &&
-            (SKIP_TAGS.has(node.tagName) || node.isContentEditable)
-        );
-    }
-
     function processText(node) {
-        if (!node || node.nodeType !== Node.TEXT_NODE) return;
+        if (node.nodeType !== Node.TEXT_NODE) return;
 
         let text = node.nodeValue;
-        let original = text;
+        const original = text;
 
         for (const [from, to] of map) {
             if (text.includes(from)) {
-                text = text.replace(new RegExp(escape(from), 'g'), to);
+                text = text.replace(new RegExp(escapeRegex(from), 'g'), to);
             }
         }
 
@@ -54,26 +49,27 @@
     }
 
     function walk(node) {
-        if (!node || shouldSkip(node)) return;
-
+        if (!node) return;
+        if (node.nodeType === 1) {
+            if (SKIP.has(node.tagName) || node.isContentEditable) return;
+        }
         if (node.nodeType === Node.TEXT_NODE) {
             processText(node);
             return;
         }
-
-        let child = node.firstChild;
-        while (child) {
+        for (let child = node.firstChild; child; child = child.nextSibling) {
             walk(child);
-            child = child.nextSibling;
         }
     }
 
+    // ריצה ראשונית
     walk(document.body);
 
+    // האזנה לתוכן חדש (צ'אטים, הודעות)
     const observer = new MutationObserver((mutations) => {
         for (const m of mutations) {
-            for (const n of m.addedNodes) {
-                walk(n);
+            for (const node of m.addedNodes) {
+                walk(node);
             }
         }
     });
