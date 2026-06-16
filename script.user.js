@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         בני ברק - אימוג'י
 // @namespace    https://github.com/tsoolgee/BNAI-BRAK-IMOGI
-// @version      0.0.1
+// @version      0.0.2
 // @description  המרת טקסט לאימוג'ים באתר bnebrak.com
 // @author       You
 // @match        https://bnebrak.com/*
@@ -36,9 +36,14 @@
         let text = node.nodeValue;
         const original = text;
         for (const [from, to] of map) {
-            if (text.includes(from)) {
-                text = text.replace(new RegExp(escapeRegex(from), 'g'), to);
-            }
+            // המילה חייבת להיות מוקפת ברווח, סימן פיסוק, או תחילת/סוף שורה
+            const regex = new RegExp(
+                '(^|[\\s.,!?;:\'"()\\[\\]])'
+                + escapeRegex(from)
+                + '(?=[\\s.,!?;:\'"()\\[\\]]|$)',
+                'g'
+            );
+            text = text.replace(regex, (match, prefix) => prefix + to);
         }
         if (text !== original) node.nodeValue = text;
     }
