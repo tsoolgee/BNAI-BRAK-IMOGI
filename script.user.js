@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         בני ברק - אימוג'י חכם PRO FINAL
 // @namespace    https://github.com/tsoolgee/BNAI-BRAK-IMOGI
-// @version      1.1.0
+// @version      1.2.0
 // @description  המרה חכמה של טקסט לאימוג'ים - יציב, מהיר ותומך בדינמיות
 // @author       You
 // @match        https://bnebrak.com/*
