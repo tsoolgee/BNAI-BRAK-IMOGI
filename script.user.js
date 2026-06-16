@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         בני ברק - אימוג'י
 // @namespace    https://github.com/tsoolgee/BNAI-BRAK-IMOGI
-// @version      0.0.5
+// @version      0.0.8
 // @description  המרת טקסט לאימוג'ים באתר bnebrak.com
 // @author       You
 // @match        https://bnebrak.com/*
@@ -18,11 +18,11 @@
         ['חחח',  '😄'],
         ['חח',   '😊'],
         ['קריצה','😉'],
-        [':עצוב','😞'],
-        [':שמח', '🙂'],
-        [':תודה','👍'],
+        ['עצוב', '😞'],
+        ['שמח',  '🙂'],
+        ['תודה', '👍'],
         ['כוכב', '⭐'],
-        [':לב',  '❤️']
+        ['לב',   '❤️']
     ];
 
     const SKIP = new Set(['INPUT','TEXTAREA','SCRIPT','STYLE','NOSCRIPT']);
@@ -31,10 +31,9 @@
         return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
-    function isWordChar(ch) {
-        if (!ch) return false;
-        // אות, ספרה, גרש, מקף = תו מילה. רווח, פיסוק, נקודותיים = לא תו מילה
-        return /[\u0590-\u05FFa-zA-Z0-9'`״׳\-]/.test(ch);
+    function isSpace(ch) {
+        // רק רווח אמיתי או אין תו בכלל = מותר להחליף
+        return !ch || ch === ' ' || ch === '\n' || ch === '\r' || ch === '\t';
     }
 
     function processText(node) {
@@ -43,8 +42,7 @@
         const original = text;
 
         for (const [from, to] of map) {
-            const escaped = escapeRegex(from);
-            const regex = new RegExp(escaped, 'g');
+            const regex = new RegExp(escapeRegex(from), 'g');
             let match;
             let result = '';
             let lastIndex = 0;
@@ -56,7 +54,8 @@
                 const charBefore = text[start - 1];
                 const charAfter = text[end];
 
-                if (!isWordChar(charBefore) && !isWordChar(charAfter)) {
+                // להחליף רק אם משני הצדדים יש רווח או אין כלום
+                if (isSpace(charBefore) && isSpace(charAfter)) {
                     result += text.slice(lastIndex, start) + to;
                 } else {
                     result += text.slice(lastIndex, end);
