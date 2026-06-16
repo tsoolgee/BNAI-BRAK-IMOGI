@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name         בני ברק - אימוג'י חכם PRO FINAL
 // @namespace    https://github.com/tsoolgee/BNAI-BRAK-IMOGI
-// @version      1.0.1
+// @version      1.0.2
 // @description  המרה חכמה של טקסט לאימוג'ים - יציב, מהיר ותומך בדינמיות
 // @author       You
 // @match        https://bnebrak.com/*
 // @grant        none
 
-// 🔄 עדכון אוטומטי תקין
-// @downloadURL  https://raw.githubusercontent.com/tsoolgee/BNAI-BRAK-IMOGI/main/script.user.js
-// @updateURL    https://raw.githubusercontent.com/tsoolgee/BNAI-BRAK-IMOGI/main/script.user.js
+// 🔄 עדכון אוטומטי תקין (חובה RAW בלבד)
+@downloadURL  https://raw.githubusercontent.com/tsoolgee/BNAI-BRAK-IMOGI/main/script.user.js
+@updateURL    https://raw.githubusercontent.com/tsoolgee/BNAI-BRAK-IMOGI/main/script.user.js
 // ==/UserScript==
 
 (function () {
@@ -69,7 +69,7 @@
     // ריצה ראשונית
     walk(document.body);
 
-    // טיפול בדפים דינמיים (צ'אטים / הודעות)
+    // טיפול בדינמיקה (צ'אטים / הודעות)
     const observer = new MutationObserver((mutations) => {
         for (const m of mutations) {
             for (const n of m.addedNodes) {
