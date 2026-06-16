@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         בני ברק - אימוג'י חכם PRO FINAL
 // @namespace    https://github.com/tsoolgee/BNAI-BRAK-IMOGI
-// @version      1.0.2
+// @version      1.1.0
 // @description  המרה חכמה של טקסט לאימוג'ים - יציב, מהיר ותומך בדינמיות
 // @author       You
 // @match        https://bnebrak.com/*
@@ -16,9 +16,16 @@
     'use strict';
 
     const map = [
-        ['חחחח', '😂'],
-        ['חחח', '😄'],
-        [':לב', '❤']
+        { search: '😂', replace: '😂' },
+        { search: '😄', replace: '😄' },
+        { search: '😊', replace: '😊' },
+        { search: '😴', replace: '😴' },
+        { search: 'קריצה', replace: '😉' },
+        { search: ':עצוב', replace: '😞' },
+        { search: ':שמח', replace: '🙂' },
+        { search: ':תודה', replace: '👍' },
+        { search: 'כוכב', replace: '⭐' },
+        { search: ':לב', replace: '❤' }
     ];
 
     const SKIP_TAGS = new Set(['INPUT', 'TEXTAREA', 'SCRIPT', 'STYLE']);
