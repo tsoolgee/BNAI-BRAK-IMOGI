@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         בני ברק - אימוג'י
 // @namespace    https://github.com/tsoolgee/BNAI-BRAK-IMOGI
-// @version      0.0.8
+// @version      0.0.0
 // @description  המרת טקסט לאימוג'ים באתר bnebrak.com
 // @author       You
 // @match        https://bnebrak.com/*
