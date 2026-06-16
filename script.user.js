@@ -1,31 +1,26 @@
 // ==UserScript==
 // @name         בני ברק - אימוג'י חכם PRO FINAL
 // @namespace    https://github.com/tsoolgee/BNAI-BRAK-IMOGI
-// @version      1.2.0
-// @description  המרה חכמה של טקסט לאימוג'ים - יציב, מהיר ותומך בדינמיות
+// @version      1.2.1
+// @description  המרה חכמה של טקסט לאימוג'ים
 // @author       You
 // @match        https://bnebrak.com/*
 // @grant        none
-
-// 🔄 עדכון אוטומטי תקין (חובה RAW בלבד)
-@downloadURL  https://raw.githubusercontent.com/tsoolgee/BNAI-BRAK-IMOGI/main/script.user.js
-@updateURL    https://raw.githubusercontent.com/tsoolgee/BNAI-BRAK-IMOGI/main/script.user.js
 // ==/UserScript==
 
 (function () {
     'use strict';
 
     const map = [
-        { search: '😂', replace: '😂' },
-        { search: '😄', replace: '😄' },
-        { search: '😊', replace: '😊' },
-        { search: '😴', replace: '😴' },
-        { search: 'קריצה', replace: '😉' },
-        { search: ':עצוב', replace: '😞' },
-        { search: ':שמח', replace: '🙂' },
-        { search: ':תודה', replace: '👍' },
-        { search: 'כוכב', replace: '⭐' },
-        { search: ':לב', replace: '❤' }
+        ['חחחח', '😂'],
+        ['חחח', '😄'],
+        ['חח', '😊'],
+        ['קריצה', '😉'],
+        [':עצוב', '😞'],
+        [':שמח', '🙂'],
+        [':תודה', '👍'],
+        ['כוכב', '⭐'],
+        [':לב', '❤']
     ];
 
     const SKIP_TAGS = new Set(['INPUT', 'TEXTAREA', 'SCRIPT', 'STYLE']);
@@ -73,10 +68,8 @@
         }
     }
 
-    // ריצה ראשונית
     walk(document.body);
 
-    // טיפול בדינמיקה (צ'אטים / הודעות)
     const observer = new MutationObserver((mutations) => {
         for (const m of mutations) {
             for (const n of m.addedNodes) {
