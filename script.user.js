@@ -1,76 +1,87 @@
 // ==UserScript==
-// @name         בני ברק - מחליף מילים לאימוג'י (עם רווחים)
-// @namespace    http://tampermonkey.net/
-// @version      1.2
-// @description  מחליף מילים מבודדות בלבד לאימוג'ים באתר bnebrak.com
+// @name         בני ברק - אימוג'י חכם PRO
+// @namespace    https://github.com/tsoolgee/BNAI-BRAK-IMOGI
+// @version      1.0.0
+// @description  המרה חכמה של טקסט לאימוג'ים + תמיכה בדפים דינמיים
 // @author       You
 // @match        https://bnebrak.com/*
 // @grant        none
+
+// 🔄 עדכון אוטומטי
+// @downloadURL  https://raw.githubusercontent.com/tsoolgee/BNAI-BRAK-IMOGI/main/script.user.js
+// @updateURL    https://raw.githubusercontent.com/tsoolgee/BNAI-BRAK-IMOGI/main/script.user.js
 // ==/UserScript==
 
-(function() {
+(function () {
     'use strict';
 
-    // מילון ההחלפות
-    const replacements = [
-        { search: '😂', replace: '😂' },
-        { search: '😄', replace: '😄' },
-        { search: '😊', replace: '😊' },
-        { search: '😴', replace: '😴' },
-        { search: 'קריצה', replace: '😉' },
-        { search: '😞', replace: '😞' },
-        { search: '🙂', replace: '🙂' },
-        { search: '👍', replace: '👍' },
-        { search: '⭐', replace: '⭐' },
-        { search: '❤', replace: '❤' }
+    const map = [
+        ['חחחח', '😂'],
+        ['חחח', '😄'],
+        ['חח', '😊'],
+        ['אני ישן', '😴'],
     ];
 
-    // פונקציה שמבצעת את ההחלפה בצומת טקסט
+    const processed = new WeakSet();
+
+    function escape(str) {
+        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
     function replaceText(node) {
+        if (!node || node.nodeType !== Node.TEXT_NODE) return;
+        if (processed.has(node)) return;
+
+        let text = node.nodeValue;
+        let changed = false;
+
+        for (const [from, to] of map) {
+            if (text.includes(from)) {
+                text = text.replace(new RegExp(escape(from), 'g'), to);
+                changed = true;
+            }
+        }
+
+        if (changed) node.nodeValue = text;
+
+        processed.add(node);
+    }
+
+    function walk(node) {
+        if (!node) return;
+
+        if (node.nodeType === 1) {
+            const tag = node.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || node.isContentEditable) return;
+        }
+
         if (node.nodeType === Node.TEXT_NODE) {
-            let text = node.nodeValue;
-            let changed = false;
+            replaceText(node);
+            return;
+        }
 
-            for (const item of replacements) {
-                // יצירת מנגנון שמחפש את המילה רק אם היא מוקפת ברווחים, סימני פיסוק, או תחילת/סוף שורה
-                // (?<=^|[\s.,?!;:]) פירושו: לפני המילה יש תחילת שורה, רווח או סימן פיסוק
-                // (?=$|[\s.,?!;:]) פירושו: אחרי המילה יש סוף שורה, רווח או סימן פיסוק
-                const regex = new RegExp(`(?<=^|[\\s.,?!;:])${item.search}(?=$|[\\s.,?!;:])`, 'g');
-                
-                if (regex.test(text)) {
-                    text = text.replace(regex, item.replace);
-                    changed = true;
-                }
-            }
-
-            if (changed) {
-                node.nodeValue = text;
-            }
-        } else {
-            // דילוג על תיבות טקסט ואלמנטים לעריכה
-            if (node.nodeName === 'INPUT' || node.nodeName === 'TEXTAREA' || node.isContentEditable) {
-                return;
-            }
-            for (let i = 0; i < node.childNodes.length; i++) {
-                replaceText(node.childNodes[i]);
-            }
+        let child = node.firstChild;
+        while (child) {
+            walk(child);
+            child = child.nextSibling;
         }
     }
 
-    // הרצה ראשונית
-    replaceText(document.body);
+    // ריצה ראשונית
+    walk(document.body);
 
-    // האזנה לשינויים דינמיים בעמוד
+    // observer חכם (רק תוספות חדשות)
     const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            mutation.addedNodes.forEach((node) => {
-                replaceText(node);
-            });
-        });
+        for (const m of mutations) {
+            for (const n of m.addedNodes) {
+                walk(n);
+            }
+        }
     });
 
     observer.observe(document.body, {
         childList: true,
         subtree: true
     });
+
 })();
