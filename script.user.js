@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name         בני ברק - אימוג'י חכם PRO MAX
+// @name         בני ברק - אימוג'י חכם PRO FINAL
 // @namespace    https://github.com/tsoolgee/BNAI-BRAK-IMOGI
-// @version      1.1.0
-// @description  המרת טקסט לאימוג'ים בצורה יציבה ומהירה לדפים דינמיים
+// @version      1.0.0
+// @description  המרה חכמה של טקסט לאימוג'ים - יציב, מהיר ותומך בדינמיות
 // @author       You
 // @match        https://bnebrak.com/*
 // @grant        none
 
-// 🔄 עדכון אוטומטי
+// 🔄 עדכון אוטומטי תקין
 // @downloadURL  https://raw.githubusercontent.com/tsoolgee/BNAI-BRAK-IMOGI/main/script.user.js
 // @updateURL    https://raw.githubusercontent.com/tsoolgee/BNAI-BRAK-IMOGI/main/script.user.js
 // ==/UserScript==
@@ -35,11 +35,13 @@
     }
 
     function shouldSkip(node) {
-        if (node.nodeType !== 1) return false;
-        return SKIP_TAGS.has(node.tagName) || node.isContentEditable;
+        return (
+            node.nodeType === 1 &&
+            (SKIP_TAGS.has(node.tagName) || node.isContentEditable)
+        );
     }
 
-    function processTextNode(node) {
+    function processText(node) {
         if (!node || node.nodeType !== Node.TEXT_NODE) return;
 
         let text = node.nodeValue;
@@ -60,7 +62,7 @@
         if (!node || shouldSkip(node)) return;
 
         if (node.nodeType === Node.TEXT_NODE) {
-            processTextNode(node);
+            processText(node);
             return;
         }
 
@@ -74,17 +76,13 @@
     // ריצה ראשונית
     walk(document.body);
 
-    // MutationObserver עם debounce קטן למניעת עומס
-    let timeout;
+    // טיפול בדפים דינמיים (צ'אטים / הודעות)
     const observer = new MutationObserver((mutations) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-            for (const m of mutations) {
-                for (const n of m.addedNodes) {
-                    walk(n);
-                }
+        for (const m of mutations) {
+            for (const n of m.addedNodes) {
+                walk(n);
             }
-        }, 50);
+        }
     });
 
     observer.observe(document.body, {
