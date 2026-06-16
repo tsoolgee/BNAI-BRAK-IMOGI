@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         בני ברק - אימוג'י חכם
+// @name         בני ברק - אימוג'י
 // @namespace    https://github.com/tsoolgee/BNAI-BRAK-IMOGI
-// @version      2.0.0
+// @version      0.0.1
 // @description  המרת טקסט לאימוג'ים באתר bnebrak.com
 // @author       You
 // @match        https://bnebrak.com/*
@@ -33,19 +33,14 @@
 
     function processText(node) {
         if (node.nodeType !== Node.TEXT_NODE) return;
-
         let text = node.nodeValue;
         const original = text;
-
         for (const [from, to] of map) {
             if (text.includes(from)) {
                 text = text.replace(new RegExp(escapeRegex(from), 'g'), to);
             }
         }
-
-        if (text !== original) {
-            node.nodeValue = text;
-        }
+        if (text !== original) node.nodeValue = text;
     }
 
     function walk(node) {
@@ -62,21 +57,12 @@
         }
     }
 
-    // ריצה ראשונית
     walk(document.body);
 
-    // האזנה לתוכן חדש (צ'אטים, הודעות)
-    const observer = new MutationObserver((mutations) => {
-        for (const m of mutations) {
-            for (const node of m.addedNodes) {
+    new MutationObserver((mutations) => {
+        for (const m of mutations)
+            for (const node of m.addedNodes)
                 walk(node);
-            }
-        }
-    });
-
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
+    }).observe(document.body, { childList: true, subtree: true });
 
 })();
